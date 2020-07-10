@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutterspiderg/model/globle.dart';
 
 void main() => runApp(new MaterialApp(
       title: "Todo App",
@@ -12,7 +13,7 @@ void main() => runApp(new MaterialApp(
 
 final FirebaseAuth mauth = FirebaseAuth.instance;
 
-final GoogleSignIn _googleSignIn = GoogleSignIn();
+final GoogleSignIn googelsignin = GoogleSignIn();
 
 class MyApp extends StatefulWidget {
   @override
@@ -26,46 +27,112 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('spiderg task'),
-      ),
-      body: Container(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              TextField(
-                controller: emailcontroller,
-              ),
-              TextField(
-                controller: passcontroller,
-              ),
-              RaisedButton(
-                child: Text('SignIn'),
-                color: Colors.blue,
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16.0)),
+      backgroundColor: darkGreyColor,
+
+      body: SafeArea(
+        child: Container(
+          color: darkGreyColor,
+          margin: EdgeInsets.only(top: 100, left: 20, right: 20, bottom: 100),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text("Welcome!", style: bigLightBlueTitle),
+                Container(
+                  height: 200,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Theme(
+                        data: Theme.of(context)
+                            .copyWith(splashColor: Colors.transparent),
+                        child: TextField(
+                          controller: emailcontroller,
+                          autofocus: false,
+                          style: TextStyle(fontSize: 22.0, color: darkGreyColor),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: 'Username',
+                            contentPadding: const EdgeInsets.only(
+                                left: 14.0, bottom: 8.0, top: 8.0),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(25.7),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(25.7),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Theme(
+                        data: Theme.of(context)
+                            .copyWith(splashColor: Colors.transparent),
+                        child: TextField(
+                          controller: passcontroller,
+                          autofocus: false,
+                          style: TextStyle(fontSize: 22.0, color: darkGreyColor),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: 'Password',
+                            contentPadding: const EdgeInsets.only(
+                                left: 14.0, bottom: 8.0, top: 8.0),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(25.7),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(25.7),
+                            ),
+                          ),
+                        ),
+                      ),
+                      FlatButton(
+                        child: Text("Sign in", style: redTodoTitle,),
+                        shape: RoundedRectangleBorder(
+
+                          borderRadius: BorderRadius.all(Radius.circular(16.0))
+                        ),
+                        onPressed: () {
+                          signinmethod();
+                        },
+                      )
+                    ],
+                  ),
                 ),
-                onPressed: () {
-                  signinmethod();
-                },
-              ),
-              RaisedButton(
-                child: Text('Google SignIn'),
-                color: Colors.blue,
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16.0)),
-                ),
-                onPressed: () {
-                  google_signinmethod();
-                },
-              ),
-            ],
+                Container(
+                  child:
+                  Column(
+                    children: <Widget>[
+                      Text("Don't you even have an account yet?!", style: redText, textAlign: TextAlign.center,),
+                      FlatButton(
+                        child: Text("create one", style: redBoldText),
+                        onPressed: () {
+
+                        },
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  googlesignout() async {
+    try {
+      await googelsignin.signOut();
+      toast('sign out sucessfuly');
+    } catch (e) {
+      toast(e.toString());
+    }
   }
 
   signinmethod() async {
@@ -76,9 +143,9 @@ class _MyAppState extends State<MyApp> {
           email: emailcontroller.text, password: passcontroller.text);
       FirebaseUser fbuser;
 
-//      //await fbuser.sendEmailVerification();
+      //await fbuser.sendEmailVerification();
 //      try {
-//        //await fbuser.sendEmailVerification();
+//        await fbuser.sendEmailVerification();
 //        //return fbuser.uid;
 //      } catch (e) {
 //        print("An error occured while trying to send email  verification");
@@ -116,7 +183,7 @@ class _MyAppState extends State<MyApp> {
     // return user.uid;
   } //end of signup method
 
-  final GoogleSignIn googelsignin = new GoogleSignIn();
+  //final GoogleSignIn googelsignin = new GoogleSignIn();
 
   google_signinmethod() async {
     var user;
@@ -124,14 +191,15 @@ class _MyAppState extends State<MyApp> {
     final GoogleSignInAuthentication googleauth =
         await googlesigninacc.authentication;
 
-    final AuthCredential credential = GoogleAuthProvider.getCredential(accessToken: googleauth.accessToken, idToken: googleauth.idToken, );
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleauth.accessToken,
+      idToken: googleauth.idToken,
+    );
     //final FirebaseUser
 
     try {
-//      user = (await mauth.signInWithGoogle(
-//          email: googleauth.idToken, password: googleauth.accessToken));
       user = await mauth.signInWithCredential(credential);
-      toast("user is signed in");
+     // toast("user is signed in");
       print("signed in ");
     } catch (e) {
       print(e.toString());
