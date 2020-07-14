@@ -1,10 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterspiderg/landing_page.dart';
+import 'package:flutterspiderg/signup.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutterspiderg/model/globle.dart';
+
+
+
+//social media mini buttons
+import 'package:flutter_signin_button/flutter_signin_button.dart';
+
+//facebook signin package
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 
 void main() => runApp(new MaterialApp(
       title: "Todo App",
@@ -14,6 +24,8 @@ void main() => runApp(new MaterialApp(
 final FirebaseAuth mauth = FirebaseAuth.instance;
 
 final GoogleSignIn googelsignin = GoogleSignIn();
+
+final FacebookLogin facebookSignIn = new FacebookLogin();
 
 class MyApp extends StatefulWidget {
   @override
@@ -28,7 +40,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: darkGreyColor,
-
       body: SafeArea(
         child: Container(
           color: darkGreyColor,
@@ -49,7 +60,8 @@ class _MyAppState extends State<MyApp> {
                         child: TextField(
                           controller: emailcontroller,
                           autofocus: false,
-                          style: TextStyle(fontSize: 22.0, color: darkGreyColor),
+                          style:
+                              TextStyle(fontSize: 22.0, color: darkGreyColor),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
@@ -73,7 +85,8 @@ class _MyAppState extends State<MyApp> {
                         child: TextField(
                           controller: passcontroller,
                           autofocus: false,
-                          style: TextStyle(fontSize: 22.0, color: darkGreyColor),
+                          style:
+                              TextStyle(fontSize: 22.0, color: darkGreyColor),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
@@ -92,11 +105,13 @@ class _MyAppState extends State<MyApp> {
                         ),
                       ),
                       FlatButton(
-                        child: Text("Sign in", style: redTodoTitle,),
-                        shape: RoundedRectangleBorder(
-
-                          borderRadius: BorderRadius.all(Radius.circular(16.0))
+                        child: Text(
+                          "Sign in",
+                          style: redTodoTitle,
                         ),
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(16.0))),
                         onPressed: () {
                           signinmethod();
                         },
@@ -104,20 +119,72 @@ class _MyAppState extends State<MyApp> {
                     ],
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Container(
+                      height: 50,
+                      width: 50,
+                      margin: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width * 0.10),
+                      child: ClipOval(
+                        child: SignInButton(
+                          Buttons.GoogleDark,
+                          mini: true,
+                          onPressed: () {
+                            google_signinmethod();
+                          },
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 50,
+                      width: 50,
+                      child: ClipOval(
+                        child: SignInButton(
+                          Buttons.Facebook,
+                          mini: true,
+                          onPressed: () {
+                            facebooksignin();
+                          },
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 50,
+                      width: 50,
+                      margin: EdgeInsets.only(
+                          right: MediaQuery.of(context).size.width * 0.10),
+                      child: ClipOval(
+                        child: SignInButton(
+                          Buttons.Twitter,
+                          mini: true,
+                          onPressed: () {},
+                        ),
+                      ),
+                    )
+                  ],
+                ),
                 Container(
-                  child:
-                  Column(
+                  child: Column(
                     children: <Widget>[
-                      Text("Don't you even have an account yet?!", style: redText, textAlign: TextAlign.center,),
+                      Text(
+                        "Don't you even have an account yet?!",
+                        style: redText,
+                        textAlign: TextAlign.center,
+                      ),
                       FlatButton(
                         child: Text("create one", style: redBoldText),
                         onPressed: () {
-
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => signup()));
                         },
                       )
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -199,13 +266,15 @@ class _MyAppState extends State<MyApp> {
 
     try {
       user = await mauth.signInWithCredential(credential);
-     // toast("user is signed in");
+      // toast("user is signed in");
       print("signed in ");
     } catch (e) {
       print(e.toString());
     }
 
     if (user != null) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => landing_page()));
       toast("user is signed in");
     } else {
       toast("signin failed");
@@ -219,4 +288,44 @@ class _MyAppState extends State<MyApp> {
       gravity: ToastGravity.BOTTOM,
     );
   }
+
+  facebooksignin() async {
+
+//    final FacebookLoginResult result =
+//        await facebookSignIn.logIn(['email']);
+//
+//    switch (result.status) {
+//      case FacebookLoginStatus.loggedIn:
+//        final FacebookAccessToken accessToken = result.accessToken;
+//        toast('signin sucessfully');
+//        break;
+//      case FacebookLoginStatus.cancelledByUser:
+//        toast('Login cancelled by the user.');
+//        break;
+//      case FacebookLoginStatus.error:
+//        toast('Something went wrong with the login process.\n'
+//            'Here\'s the error Facebook gave us: ${result.errorMessage}');
+//        break;
+//    }
+
+    try {
+      var facebookLogin = new FacebookLogin();
+      var result = await facebookLogin.logIn(['email']);
+
+      if(result.status == FacebookLoginStatus.loggedIn) {
+        final AuthCredential credential = FacebookAuthProvider.getCredential(
+          accessToken: result.accessToken.token,
+
+        );
+        final FirebaseUser user = (await FirebaseAuth.instance.signInWithCredential(credential)).user;
+        print('signed in ' + user.displayName);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => landing_page()));
+        return user;
+      }
+    }catch (e) {
+      print(e.message);
+    }
+
+  }//end of fb signin method
 }

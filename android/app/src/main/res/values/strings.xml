@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="facebook_app_id">718221612307164</string>
+    <string name="fb_login_protocol_scheme">fb718221612307164</string>
+    <string name="app_name">spider_g</string>
+</resources>
